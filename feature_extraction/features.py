@@ -119,8 +119,6 @@ class Features(object):
         downsample=True,
         interp="lanczos",
         split_type: str = "sentence",
-        bert_trial_num=None,
-        bert_step_num=None,
         max_seq_length: int = 512,
     ):
         clm_stimulus = dict()
@@ -130,8 +128,6 @@ class Features(object):
                 model_name=model_name,
                 layer_num=layer_num,
                 split_type=split_type,
-                bert_trial_num=bert_trial_num,
-                bert_step_num=bert_step_num,
                 max_seq_length=max_seq_length,
             )
         if downsample:
@@ -221,11 +217,11 @@ def get_contextual_embeddings(
     new_data = []
     if split_type == "sentence":
         sentence_starts, sentence_ends, split_inds, data_times, text = get_clean_text(
-            ds_with_sentence_boundaries, remove_repeated_words=False
+            ds_with_sentence_boundaries
         )
     elif split_type == "causal_all":
         _, _, split_inds, data_times, text = get_clean_text(
-            ds_with_sentence_boundaries, remove_repeated_words=False
+            ds_with_sentence_boundaries
         )
         sentence_starts = [
             np.clip(0, a_min=word_index - max_seq_length, a_max=None)
@@ -238,7 +234,7 @@ def get_contextual_embeddings(
     for sentence_start, sentence_end in zip(sentence_starts, sentence_ends):
         sentence = text[sentence_start : sentence_end + 1]
         if sentence[-1] == ".":
-            continue
+            sentence = sentence[:-1]  # remove periods for input to BERT.
         tokenized_input_sequence = np.concatenate(
             [tokenizer.tokenize(word) for word in sentence]
         )

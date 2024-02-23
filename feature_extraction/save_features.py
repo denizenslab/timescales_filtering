@@ -455,7 +455,6 @@ if __name__ == "__main__":
     for story_name in train_stories[:1] + test_stories + train_stories[1:]:
         extract_features(
             featureset_name=featureset_name,
-            use_lowpass=True,
             num_neurons=num_neurons,
             story_name=story_name,
         )
